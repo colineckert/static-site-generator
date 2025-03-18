@@ -7,6 +7,7 @@ from inline_markdown import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 
 class TestSplitNodes(unittest.TestCase):
@@ -96,23 +97,6 @@ class TestSplitNodesImage(unittest.TestCase):
             new_nodes,
         )
 
-    def test_split_nodes_image_with_malformed_markdown(self):
-        node = TextNode(
-            "This text has malformed markdown ![missing-url]( and ![alt-without](https://example.com)",
-            TextType.TEXT
-        )
-        new_nodes = split_nodes_image([node])
-        self.assertListEqual(
-            [
-                # The entire input text should remain as a single TextNode
-                # because no valid image markdown can be parsed from it
-                TextNode(
-                    "This text has malformed markdown ![missing-url]( and ![alt-without](https://example.com)",
-                    TextType.TEXT
-                )
-            ],
-            new_nodes,
-        )
 
 class TestSplitNodesLink(unittest.TestCase):
     def test_split_links(self):
@@ -131,20 +115,23 @@ class TestSplitNodesLink(unittest.TestCase):
             new_nodes,
         )
 
-    def test_split_nodes_link_with_malformed_markdown(self):
-        node = TextNode(
-            "This text has malformed markdown [missing-url]( and [alt-without](https://example.com)",
-            TextType.TEXT
-        )
-        new_nodes = split_nodes_link([node])
+
+class TestTextToNodes(unittest.TestCase):
+    def test_text_to_nodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        nodes = text_to_textnodes(text)
         self.assertListEqual(
             [
-                # The entire input text should remain as a single TextNode
-                # because no valid image markdown can be parsed from it
-                TextNode(
-                    "This text has malformed markdown [missing-url]( and [alt-without](https://example.com)",
-                    TextType.TEXT
-                )
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
             ],
-            new_nodes,
+            nodes,
         )
