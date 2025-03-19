@@ -83,13 +83,14 @@ class TestBlockMarkdown(unittest.TestCase):
     def test_blockquote(self):
         md = """
     > This is a blockquote
+    > with more text
     """
 
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
             html,
-            "<div><blockquote>This is a blockquote</blockquote></div>",
+            "<div><blockquote>This is a blockquote with more text</blockquote></div>",
         )
 
     def test_codeblock(self):
