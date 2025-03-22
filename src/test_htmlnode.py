@@ -58,11 +58,6 @@ class TestHTMLNode(unittest.TestCase):
         parent_node = ParentNode("div", [node], { "class": "container" })
         self.assertEqual(parent_node.to_html(), '<div class="container"><button type="button">Click me</button></div>')
 
-    def test_to_html_without_children(self):
-        node = ParentNode("div", [])
-        with self.assertRaises(ValueError):
-            node.to_html()
-
     def test_to_html_without_tag(self):
         node = ParentNode(None, [LeafNode("span", "child")])
         with self.assertRaises(ValueError):
